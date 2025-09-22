@@ -7,6 +7,7 @@
     <meta name="keywords" content="review laptop, laptop lokal, rating laptop, laptop Indonesia">
     <meta name="author" content="Tim Review Laptop Lokal">
     <title>Website Review dan Rating Laptop Lokal</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
@@ -25,41 +26,43 @@
         <section id="beranda">
             <h2>Selamat Datang</h2>
             <p>Website review dan rating laptop lokal terpercaya di Indonesia. Temukan ulasan mendalam, perbandingan objektif, dan rekomendasi laptop dari brand lokal Indonesia.</p>
-            <a href="#review">Lihat Review</a>
+            <a href="#review" class="btn btn-primary">Lihat Review</a>
         </section>
 
         <section id="review">
             <h2>Review Laptop Terbaru</h2>
             
-            <article>
-                <img src="IMG/pongo 725.png" alt="Deskripsi gambar" width="200" height="150">
-                <h3>Axioo Pongo 725</h3>
-                <p>Rating: 4.2 dari 5</p>
-                <p>Laptop gaming lokal dengan performa mengesankan di kelasnya. Cocok untuk gaming dan produktivitas dengan harga terjangkau.</p>
-                <time datetime="2025-08-01">1 September 2025</time>
-                <br>
-                <a href="#">Baca Selengkapnya</a>
-            </article>
-            
-            <article>
-                <img src="IMG/Advan-Work-Pro-Lite-9.jpg" alt="Deskripsi gambar" width="200" height="200">
-                <h3>Advan WorkPro</h3>
-                <p>Rating: 4.0 dari 5</p>
-                <p>Laptop budget terbaik untuk kebutuhan office dan pembelajaran online.</p>
-                <time datetime="2023-07-15">15 Agustus 2023</time>
-                <br>
-                <a href="#">Baca Selengkapnya</a>
-            </article>
+            <div class="review-grid">
+                <article class="card card-featured">
+                    <img src="IMG/pongo 725.png" alt="Axioo Pongo 725" width="200" height="150">
+                    <h3>Axioo Pongo 725</h3>
+                    <p><strong>Rating: 4.2 dari 5</strong></p>
+                    <p>Laptop gaming lokal dengan performa mengesankan di kelasnya. Cocok untuk gaming dan produktivitas dengan harga terjangkau.</p>
+                    <time datetime="2025-08-01">1 September 2025</time>
+                    <br><br>
+                    <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                </article>
+                
+                <article class="card">
+                    <img src="IMG/Advan-Work-Pro-Lite-9.jpg" alt="Advan WorkPro" width="200" height="200">
+                    <h3>Advan WorkPro</h3>
+                    <p><strong>Rating: 4.0 dari 5</strong></p>
+                    <p>Laptop budget terbaik untuk kebutuhan office dan pembelajaran online.</p>
+                    <time datetime="2023-07-15">15 Agustus 2023</time>
+                    <br><br>
+                    <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                </article>
 
-            <article>
-                <img src="IMG/Zyrex.jpg" alt="Deskripsi gambar" width="200" height="200">
-                <h3>Zyrex Sky 232</h3>
-                <p>Rating: 3.5 dari 5</p>
-                <p>Ultrabook ringan dengan daya tahan baterai luar biasa. Ideal untuk pelajar dan pekerja mobile.</p>
-                <time datetime="2021-01-08">8 Januari 2021</time>
-                <br>
-                <a href="#">Baca Selengkapnya</a>
-            </article>
+                <article class="card">
+                    <img src="IMG/Zyrex.jpg" alt="Zyrex Sky 232" width="200" height="200">
+                    <h3>Zyrex Sky 232</h3>
+                    <p><strong>Rating: 3.5 dari 5</strong></p>
+                    <p>Ultrabook ringan dengan daya tahan baterai luar biasa. Ideal untuk pelajar dan pekerja mobile.</p>
+                    <time datetime="2021-01-08">8 Januari 2021</time>
+                    <br><br>
+                    <a href="#" class="btn btn-secondary">Baca Selengkapnya</a>
+                </article>
+            </div>
         </section>
 
         <section id="perbandingan">
@@ -103,7 +106,6 @@
                         <td>Rp 7.499.000</td>
                         <td>3.5/5</td>
                     </tr>
-                    <tr>
                 </tbody>
             </table>
         </section>
@@ -112,20 +114,22 @@
             <h2>Brand Laptop Lokal Indonesia</h2>
             <p>Daftar brand laptop lokal yang tersedia di Indonesia:</p>
             <ul>
-                <li>
+                <li class="card">
                     <h3>Axioo</h3>
                     <p>Produsen laptop lokal dengan fokus pada gaming dan performa tinggi.</p>
                 </li>
-                <li>
+                <li class="card">
                     <h3>Zyrex</h3>
-                    <p>Spesialis ultrabook dan laptop bisnis (hoax).</p>
+                    <p>Spesialis ultrabook dan laptop bisnis.</p>
                 </li>
-                <li>
+                <li class="card">
                     <h3>Advan</h3>
                     <p>Laptop terjangkau untuk segmen entry-level.</p>
                 </li>
             </ul>
         </section>
+
+        <section class="references">
             <h3>Referensi Desain</h3>
             <p>Website yang menjadi inspirasi desain:</p>
             <ul>
@@ -136,8 +140,10 @@
                 <li><a href="https://www.tomshardware.com" target="_blank" rel="noopener noreferrer">Tom's Hardware</a></li>
             </ul>
         </section>
-        <p><small>Copyright Belum Beli - Website Review dan Rating Laptop Lokal</small></p>
-        
+    </main>
+
+    <footer>
+        <p><small>Belum Beli Hak Cipta (Mahal Cuy) - Website Review dan Rating Laptop Lokal</small></p>
     </footer>
 </body>
 </html>
