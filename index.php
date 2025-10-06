@@ -1,3 +1,13 @@
+<time datetime="2025-09-01">1 September 2025</time>
+                    <br><br><?php
+// Cek apakah user sudah login
+session_start();
+$is_logged_in = isset($_SESSION['username']);
+$username = $is_logged_in ? $_SESSION['username'] : null;
+
+// Handle query string untuk filter (jika diperlukan di beranda)
+$section = $_GET['section'] ?? 'beranda';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -22,10 +32,19 @@
             </h1>
             <div class="nav-controls">
                 <ul>
-                    <li><a href="#beranda" class="active">Beranda</a></li>
-                    <li><a href="#review">Review</a></li>
-                    <li><a href="#perbandingan">Perbandingan</a></li>
-                    <li><a href="#brand">Brand</a></li>
+                    <li><a href="index.php#beranda" class="<?php echo $section === 'beranda' ? 'active' : ''; ?>">Beranda</a></li>
+                    <li><a href="index.php#review">Review</a></li>
+                    <li><a href="index.php#perbandingan">Perbandingan</a></li>
+                    <li><a href="index.php#brand">Brand</a></li>
+                    <?php if ($is_logged_in): ?>
+                        <li><a href="dashboard.php" style="color: #3b82f6; font-weight: 600;">
+                            <i class="fas fa-user-circle"></i> Dashboard
+                        </a></li>
+                    <?php else: ?>
+                        <li><a href="login.php" style="color: #10b981; font-weight: 600;">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a></li>
+                    <?php endif; ?>
                 </ul>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
                     <i class="fas fa-moon"></i>
@@ -38,6 +57,14 @@
         <section id="beranda" class="animate-on-scroll">
             <h2>Review Laptop Lokal Terpercaya</h2>
             <p>Temukan ulasan mendalam, perbandingan objektif, dan rekomendasi laptop dari brand lokal Indonesia terbaik. Fokus pada model-model yang benar-benar tersedia di pasar Indonesia.</p>
+            
+            <?php if ($is_logged_in): ?>
+            <div style="text-align: center; margin: 20px 0; padding: 15px; background: var(--card-bg); border-radius: 8px; border: 2px solid #10b981;">
+                <p style="color: #10b981; font-weight: 600; margin: 0;">
+                    <i class="fas fa-check-circle"></i> Selamat datang kembali, <?php echo htmlspecialchars($username); ?>!
+                </p>
+            </div>
+            <?php endif; ?>
             
             <!-- Search Section -->
             <div class="search-section">
@@ -84,29 +111,29 @@
                     <p class="price">Rp 12.999.000</p>
                     <time datetime="2025-09-01">1 September 2025</time>
                     <br><br>
-                    <a href="#" class="btn btn-secondary">Baca Review</a>
+                    <a href="review.php?id=1" class="btn btn-secondary">Baca Review</a>
                 </article>
                 
                 <article class="card">
-                    <img src="IMG/Advan-Work-Pro-Lite-9.jpg" alt="Advan WorkPro" width="200" height="200" loading="lazy">
+                    <img src="IMG/Advan-Work-Pro-Lite-9.png" alt="Advan WorkPro" width="200" height="200" loading="lazy">
                     <h3>Advan WorkPro</h3>
                     <p><strong>Rating: 4.0 dari 5</strong></p>
                     <p>Laptop budget champion untuk kebutuhan office dan pembelajaran online dengan value terbaik di kelasnya.</p>
                     <p class="price">Rp 3.999.000</p>
                     <time datetime="2023-08-15">15 Agustus 2023</time>
                     <br><br>
-                    <a href="#" class="btn btn-secondary">Baca Review</a>
+                    <a href="review.php?id=2" class="btn btn-secondary">Baca Review</a>
                 </article>
 
                 <article class="card">
-                    <img src="IMG/Zyrex.jpg" alt="Zyrex Sky 232" width="200" height="200" loading="lazy">
+                    <img src="IMG/Zyrex.png" alt="Zyrex Sky 232" width="200" height="200" loading="lazy">
                     <h3>Zyrex Sky 232</h3>
                     <p><strong>Rating: 3.5 dari 5</strong></p>
                     <p>Ultrabook ringan dengan daya tahan baterai solid untuk mobilitas tinggi profesional dan pelajar.</p>
                     <p class="price">Rp 7.499.000</p>
                     <time datetime="2021-01-08">8 Januari 2021</time>
                     <br><br>
-                    <a href="#" class="btn btn-secondary">Baca Review</a>
+                    <a href="review.php?id=3" class="btn btn-secondary">Baca Review</a>
                 </article>
             </div>
             
@@ -486,6 +513,11 @@
                 <a href="#review"><i class="fas fa-star"></i> Review</a>
                 <a href="#perbandingan"><i class="fas fa-balance-scale"></i> Perbandingan</a>
                 <a href="#brand"><i class="fas fa-building"></i> Brand</a>
+                <?php if ($is_logged_in): ?>
+                    <a href="dashboard.php"><i class="fas fa-user-circle"></i> Dashboard</a>
+                <?php else: ?>
+                    <a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <?php endif; ?>
             </div>
         </div>
     </footer>
