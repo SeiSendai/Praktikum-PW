@@ -10,201 +10,127 @@ if (!isset($_SESSION['username'])) {
 $username = $_SESSION['username'];
 $login_time = $_SESSION['login_time'] ?? 'Unknown';
 
+// Koneksi database
+$host = 'localhost';
+$dbname = 'review_laptop_lokal';
+$db_username = 'root';
+$db_password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_username, $db_password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// Handle CRUD Operations
+$message = '';
+$message_type = '';
+
+// DELETE Operation
+if (isset($_GET['delete']) && isset($_GET['id'])) {
+    try {
+        $stmt = $pdo->prepare("DELETE FROM laptops WHERE id = ?");
+        $stmt->execute([$_GET['id']]);
+        $message = 'Laptop berhasil dihapus!';
+        $message_type = 'success';
+    } catch(PDOException $e) {
+        $message = 'Error: ' . $e->getMessage();
+        $message_type = 'error';
+    }
+}
+
 // Handle filter dari query string
 $price_filter = $_GET['price'] ?? 'all';
 $rating_filter = $_GET['rating'] ?? 'all';
 $search_query = $_GET['search'] ?? '';
 $brand_filter = $_GET['brand'] ?? 'all';
 
-// Data laptop (dalam produksi gunakan database)
-$laptops = [
-    [
-        'id' => 1,
-        'name' => 'Axioo Pongo 725',
-        'brand' => 'Axioo',
-        'rating' => 4.2,
-        'price' => 12999000,
-        'description' => 'Gaming laptop flagship dari Axioo dengan performa tinggi dan cooling system yang mumpuni untuk gaming intensif.',
-        'image' => 'IMG/pongo 725.png',
-        'processor' => 'Intel Core i7-10750H',
-        'ram' => '16GB DDR4',
-        'storage' => '512GB SSD',
-        'category' => 'Gaming',
-        'stock' => 15
-    ],
-    [
-        'id' => 2,
-        'name' => 'Advan WorkPro',
-        'brand' => 'Advan',
-        'rating' => 4.0,
-        'price' => 3999000,
-        'description' => 'Laptop budget champion untuk kebutuhan office dan pembelajaran online dengan value terbaik di kelasnya.',
-        'image' => 'IMG/Advan-Work-Pro-Lite-9.png',
-        'processor' => 'Intel Celeron N4020',
-        'ram' => '4GB DDR4',
-        'storage' => '128GB SSD',
-        'category' => 'Office',
-        'stock' => 32
-    ],
-    [
-        'id' => 3,
-        'name' => 'Zyrex Sky 232',
-        'brand' => 'Zyrex',
-        'rating' => 3.5,
-        'price' => 7499000,
-        'description' => 'Ultrabook ringan dengan daya tahan baterai solid untuk mobilitas tinggi profesional dan pelajar.',
-        'image' => 'IMG/Zyrex.png',
-        'processor' => 'Intel Core i5-1135G7',
-        'ram' => '8GB DDR4',
-        'storage' => '256GB SSD',
-        'category' => 'Ultrabook',
-        'stock' => 8
-    ],
-    [
-        'id' => 4,
-        'name' => 'Axioo MyBook 14H',
-        'brand' => 'Axioo',
-        'rating' => 4.0,
-        'price' => 7499000,
-        'description' => 'Laptop produktivitas dengan layar 14 inci Full HD dan performa handal untuk pekerjaan sehari-hari.',
-        'image' => 'IMG/axioo-mybook14h.png',
-        'processor' => 'Intel Core i5-1135G7',
-        'ram' => '8GB DDR4',
-        'storage' => '256GB SSD',
-        'category' => 'Productivity',
-        'stock' => 22
-    ],
-    [
-        'id' => 5,
-        'name' => 'Axioo Slimbook 13',
-        'brand' => 'Axioo',
-        'rating' => 3.8,
-        'price' => 8299000,
-        'description' => 'Ultrabook tipis dan ringan dengan desain premium untuk mobilitas maksimal profesional muda.',
-        'image' => 'IMG/axioo-slimbook13.png',
-        'processor' => 'Intel Core i3-1115G4',
-        'ram' => '8GB DDR4',
-        'storage' => '256GB SSD',
-        'category' => 'Ultrabook',
-        'stock' => 12
-    ],
-    [
-        'id' => 6,
-        'name' => 'Advan CloudBook',
-        'brand' => 'Advan',
-        'rating' => 3.4,
-        'price' => 2999000,
-        'description' => 'Laptop ultra-budget untuk cloud computing dan web browsing dengan efisiensi maksimal.',
-        'image' => 'IMG/advan-cloudbook.png',
-        'processor' => 'Intel Celeron N4000',
-        'ram' => '4GB DDR4',
-        'storage' => '128GB SSD',
-        'category' => 'Budget',
-        'stock' => 45
-    ],
-    [
-        'id' => 7,
-        'name' => 'Axioo Pongo 735',
-        'brand' => 'Axioo',
-        'rating' => 4.1,
-        'price' => 13999000,
-        'description' => 'Gaming laptop terbaru dengan cooling yang lebih baik dan performa gaming yang mengesankan.',
-        'image' => 'IMG/axioo-pongo735.png',
-        'processor' => 'Intel Core i7-11370H',
-        'ram' => '16GB DDR4',
-        'storage' => '512GB SSD',
-        'category' => 'Gaming',
-        'stock' => 9
-    ],
-    [
-        'id' => 8,
-        'name' => 'Advan Soulmate 13',
-        'brand' => 'Advan',
-        'rating' => 3.7,
-        'price' => 5499000,
-        'description' => 'Laptop compact 13 inci dengan desain elegan untuk lifestyle dan productivity ringan.',
-        'image' => 'IMG/advan-soulmate13.jpg',
-        'processor' => 'Intel Core i3-10110U',
-        'ram' => '8GB DDR4',
-        'storage' => '256GB SSD',
-        'category' => 'Lifestyle',
-        'stock' => 18
-    ],
-    [
-        'id' => 9,
-        'name' => 'Zyrex Ellipsis 13',
-        'brand' => 'Zyrex',
-        'rating' => 4.0,
-        'price' => 12499000,
-        'description' => 'Premium ultrabook dengan build quality terbaik untuk professional dan enterprise.',
-        'image' => 'IMG/zyrex-ellipsis13.png',
-        'processor' => 'Intel Core i7-1165G7',
-        'ram' => '16GB DDR4',
-        'storage' => '512GB SSD',
-        'category' => 'Premium',
-        'stock' => 6
-    ]
-];
+// Fetch data dari database
+try {
+    // Fetch brands
+    $brands_stmt = $pdo->query("SELECT * FROM brands WHERE is_active = 1 ORDER BY name");
+    $brands = $brands_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Filter laptop berdasarkan kriteria
-$filtered_laptops = array_filter($laptops, function($laptop) use ($price_filter, $rating_filter, $search_query, $brand_filter) {
-    // Filter brand
-    $brand_match = true;
+    // Build query untuk laptop dengan filter
+    $query = "SELECT l.*, b.name as brand_name 
+              FROM laptops l 
+              LEFT JOIN brands b ON l.brand_id = b.id 
+              WHERE l.is_active = 1";
+    
+    $params = [];
+    
     if ($brand_filter !== 'all') {
-        $brand_match = $laptop['brand'] === $brand_filter;
+        $query .= " AND b.name = ?";
+        $params[] = $brand_filter;
     }
     
-    // Filter harga
-    $price_match = true;
     if ($price_filter !== 'all') {
         if ($price_filter === '0-4000000') {
-            $price_match = $laptop['price'] < 4000000;
+            $query .= " AND l.price < 4000000";
         } elseif ($price_filter === '4000000-7000000') {
-            $price_match = $laptop['price'] >= 4000000 && $laptop['price'] <= 7000000;
+            $query .= " AND l.price BETWEEN 4000000 AND 7000000";
         } elseif ($price_filter === '7000000-10000000') {
-            $price_match = $laptop['price'] >= 7000000 && $laptop['price'] <= 10000000;
+            $query .= " AND l.price BETWEEN 7000000 AND 10000000";
         } elseif ($price_filter === '10000000') {
-            $price_match = $laptop['price'] > 10000000;
+            $query .= " AND l.price > 10000000";
         }
     }
     
-    // Filter rating
-    $rating_match = true;
     if ($rating_filter !== 'all') {
-        $rating_match = $laptop['rating'] >= floatval($rating_filter);
+        $query .= " AND l.rating >= ?";
+        $params[] = floatval($rating_filter);
     }
     
-    // Filter pencarian
-    $search_match = true;
     if (!empty($search_query)) {
-        $search_match = stripos($laptop['name'], $search_query) !== false || 
-                       stripos($laptop['description'], $search_query) !== false ||
-                       stripos($laptop['processor'], $search_query) !== false;
+        $query .= " AND (l.name LIKE ? OR l.description LIKE ? OR l.processor LIKE ?)";
+        $search_param = "%$search_query%";
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $params[] = $search_param;
     }
     
-    return $brand_match && $price_match && $rating_match && $search_match;
-});
+    $query .= " ORDER BY l.created_at DESC";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    $laptops = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hitung statistik
-$total_laptops = count($laptops);
-$filtered_count = count($filtered_laptops);
-$avg_rating = $total_laptops > 0 ? array_sum(array_column($laptops, 'rating')) / $total_laptops : 0;
-$total_stock = array_sum(array_column($laptops, 'stock'));
-$avg_price = $total_laptops > 0 ? array_sum(array_column($laptops, 'price')) / $total_laptops : 0;
+    // Hitung statistik
+    $stats_query = "SELECT 
+                    COUNT(*) as total_laptops,
+                    ROUND(AVG(rating), 2) as avg_rating,
+                    SUM(stock) as total_stock,
+                    ROUND(AVG(price), 2) as avg_price
+                    FROM laptops WHERE is_active = 1";
+    $stats = $pdo->query($stats_query)->fetch(PDO::FETCH_ASSOC);
 
-// Statistik per brand
-$brands = ['Axioo', 'Advan', 'Zyrex'];
-$brand_stats = [];
-foreach ($brands as $brand) {
-    $brand_laptops = array_filter($laptops, function($l) use ($brand) {
-        return $l['brand'] === $brand;
-    });
-    $brand_stats[$brand] = [
-        'count' => count($brand_laptops),
-        'avg_rating' => count($brand_laptops) > 0 ? array_sum(array_column($brand_laptops, 'rating')) / count($brand_laptops) : 0,
-        'total_stock' => array_sum(array_column($brand_laptops, 'stock'))
-    ];
+    // Statistik per brand
+    $brand_stats_query = "SELECT 
+                          b.name as brand_name,
+                          COUNT(l.id) as count,
+                          ROUND(AVG(l.rating), 2) as avg_rating,
+                          SUM(l.stock) as total_stock
+                          FROM brands b
+                          LEFT JOIN laptops l ON b.id = l.brand_id AND l.is_active = 1
+                          WHERE b.is_active = 1
+                          GROUP BY b.id, b.name";
+    $brand_stats_result = $pdo->query($brand_stats_query)->fetchAll(PDO::FETCH_ASSOC);
+    
+    $brand_stats = [];
+    foreach ($brand_stats_result as $stat) {
+        $brand_stats[$stat['brand_name']] = $stat;
+    }
+
+} catch(PDOException $e) {
+    die("Query failed: " . $e->getMessage());
 }
+
+$total_laptops = $stats['total_laptops'] ?? 0;
+$filtered_count = count($laptops);
+$avg_rating = $stats['avg_rating'] ?? 0;
+$total_stock = $stats['total_stock'] ?? 0;
+$avg_price = $stats['avg_price'] ?? 0;
 
 function formatRupiah($number) {
     return 'Rp ' . number_format($number, 0, ',', '.');
@@ -323,6 +249,40 @@ function getStockStatus($stock) {
             background: var(--hover-bg);
             transform: translateY(-2px);
             border-color: #3b82f6;
+        }
+
+        /* Message Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Stats Grid */
@@ -611,6 +571,70 @@ function getStockStatus($stock) {
             gap: 6px;
         }
 
+        /* CRUD Buttons */
+        .btn-add {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
         /* Laptop Table */
         .laptop-table-container {
             background: var(--card-bg);
@@ -626,6 +650,8 @@ function getStockStatus($stock) {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .table-header h3 {
@@ -764,6 +790,12 @@ function getStockStatus($stock) {
             line-height: 1.6;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -835,6 +867,11 @@ function getStockStatus($stock) {
                 width: 100%;
                 justify-content: center;
             }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -861,6 +898,14 @@ function getStockStatus($stock) {
 
     <main style="margin-top: 100px;">
         <div class="dashboard-container">
+            <!-- Message Alert -->
+            <?php if (!empty($message)): ?>
+            <div class="alert <?php echo $message_type; ?>">
+                <i class="fas <?php echo $message_type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
+                <span><?php echo htmlspecialchars($message); ?></span>
+            </div>
+            <?php endif; ?>
+
             <!-- Dashboard Header -->
             <div class="dashboard-header">
                 <div class="user-info">
@@ -980,9 +1025,11 @@ function getStockStatus($stock) {
                         <label><i class="fas fa-building"></i> Brand</label>
                         <select name="brand">
                             <option value="all" <?php echo $brand_filter === 'all' ? 'selected' : ''; ?>>Semua Brand</option>
-                            <option value="Axioo" <?php echo $brand_filter === 'Axioo' ? 'selected' : ''; ?>>Axioo</option>
-                            <option value="Advan" <?php echo $brand_filter === 'Advan' ? 'selected' : ''; ?>>Advan</option>
-                            <option value="Zyrex" <?php echo $brand_filter === 'Zyrex' ? 'selected' : ''; ?>>Zyrex</option>
+                            <?php foreach ($brands as $brand): ?>
+                            <option value="<?php echo htmlspecialchars($brand['name']); ?>" <?php echo $brand_filter === $brand['name'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($brand['name']); ?>
+                            </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -1062,6 +1109,10 @@ function getStockStatus($stock) {
                         <i class="fas fa-table"></i>
                         Data Laptop
                     </h3>
+                    <a href="laptop_add.php" class="btn-add">
+                        <i class="fas fa-plus"></i>
+                        Tambah Laptop
+                    </a>
                 </div>
 
                 <?php if ($filtered_count > 0): ?>
@@ -1075,10 +1126,11 @@ function getStockStatus($stock) {
                             <th>Harga</th>
                             <th>Stok</th>
                             <th>Kategori</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($filtered_laptops as $laptop): ?>
+                        <?php foreach ($laptops as $laptop): ?>
                         <?php $stock_status = getStockStatus($laptop['stock']); ?>
                         <tr>
                             <td>
@@ -1094,8 +1146,8 @@ function getStockStatus($stock) {
                                 </div>
                             </td>
                             <td>
-                                <span class="brand-badge <?php echo strtolower($laptop['brand']); ?>">
-                                    <?php echo htmlspecialchars($laptop['brand']); ?>
+                                <span class="brand-badge <?php echo strtolower($laptop['brand_name']); ?>">
+                                    <?php echo htmlspecialchars($laptop['brand_name']); ?>
                                 </span>
                             </td>
                             <td>
@@ -1139,6 +1191,20 @@ function getStockStatus($stock) {
                                     <?php echo htmlspecialchars($laptop['category']); ?>
                                 </span>
                             </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="laptop_edit.php?id=<?php echo $laptop['id']; ?>" class="btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                    <a href="dashboard.php?delete=1&id=<?php echo $laptop['id']; ?>" 
+                                       class="btn-delete"
+                                       onclick="return confirm('Apakah Anda yakin ingin menghapus laptop ini?');">
+                                        <i class="fas fa-trash"></i>
+                                        Hapus
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -1167,7 +1233,7 @@ function getStockStatus($stock) {
         <div class="footer-content">
             <p><small>
                 <i class="fas fa-copyright"></i>
-                2025 Review Laptop Lokal - Dashboard Pengnative Handal
+                2025 Review Laptop Lokal - Dashboard Pengelola Handal
             </small></p>
             <div class="footer-links">
                 <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
@@ -1178,5 +1244,16 @@ function getStockStatus($stock) {
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        // Auto hide alert after 5 seconds
+        setTimeout(function() {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-10px)';
+                setTimeout(() => alert.remove(), 300);
+            }
+        }, 5000);
+    </script>
 </body>
 </html>
